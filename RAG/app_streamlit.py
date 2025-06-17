@@ -1,39 +1,12 @@
 import os
 import sys
+import zipfile
 import streamlit as st
-from langchain_chroma import Chroma
-from langchain_community.document_loaders import DirectoryLoader, UnstructuredHTMLLoader
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 # Ensure the RAG module is in the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from RAG.app import get_answer
 
-
-#------------------------------------------------------------------------------------------
-#just for the deployment of the streamlit app online
-
-PERSIST_DIR = "./chroma_db"
-DATASET_DIR = "./pokemon_dataset"
-
-def create_vectorstore():
-    loader = DirectoryLoader(DATASET_DIR, loader_cls=UnstructuredHTMLLoader)
-    docs = loader.load()
-
-    for doc in docs:
-        text_content = doc.page_content
-        text_content = text_content.replace("[modifier]", "")
-        text_content = "№" + text_content.split("№")[1]
-        text_content = text_content.split("Dans le Jeu de Cartes à Collectionner")[0]
-        doc.page_content = "".join(text_content)
-
-    gemini_embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    Chroma.from_documents(
-        documents=docs,
-        embedding=gemini_embeddings,
-        persist_directory=PERSIST_DIR,
-    )
-#------------------------------------------------------------------------------------------
 
 
 def app_streamlit():
@@ -161,8 +134,8 @@ def app_streamlit():
 
 
 if __name__ == "__main__":
-    if not os.path.exists(PERSIST_DIR):
-        print("Vectorstore not found. Creating it now...")
-        create_vectorstore()
-
+    if not os.path.exists("chroma_db") and os.path.exists("chroma_db.zip"):
+        print("Décompression de la base vectorielle...")
+        with zipfile.ZipFile("chroma_db.zip", "r") as zip_ref:
+            zip_ref.extractall("chroma_db")
     app_streamlit()
