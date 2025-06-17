@@ -11,5 +11,5 @@ wheels/
 .venv
 
 #custom
-#pokemon_dataset
-chroma_db
+pokemon_dataset
+#chroma_db
