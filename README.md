@@ -1,3 +1,5 @@
+by Quentin Chauvel and Aurianne Schwartz
+
 first you need to install the dependancies with [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 `uv sync`
