@@ -8,12 +8,22 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from RAG.app import get_answer
 
 
+def decompress_if_needed():
+    """Décompresse chroma_db.zip dans chroma_db si besoin."""
+    if not os.path.exists("chroma_db") and os.path.exists("chroma_db.zip"):
+        with st.spinner("Décompression de la base vectorielle..."):
+            with zipfile.ZipFile("chroma_db.zip", "r") as zip_ref:
+                zip_ref.extractall("chroma_db")
+        st.success("Base vectorielle décompressée.")
+
 
 def app_streamlit():
     """
         Build the RAG application with Streamlit. 
     """
-    st.set_page_config(page_title="Pokémon RAG", page_icon="🧠", layout="wide") # <-- CHANGEMENT ICI
+    st.set_page_config(page_title="Pokémon RAG", page_icon="🧠", layout="wide")
+    
+    decompress_if_needed()
 
     #CSS of the application
     st.markdown("""
@@ -56,14 +66,14 @@ def app_streamlit():
     </style>
     """, unsafe_allow_html=True)
 
-    # Title of the application
+    # Titre
     st.markdown(
         "<h1 style='text-align: center; white-space: nowrap; font-size: 48px;'>"
         "<span style='color:#e93a14;'>Poké</span>Savant</h1>",
         unsafe_allow_html=True,
     )
 
-    # Display top Pokémon images
+    # Images Pokémon
     top_pokemon_urls = [
         "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png",  # Bulbizarre
         "https://assets.pokemon.com/assets/cms2/img/pokedex/full/050.png",  # Taupiqueur
@@ -76,7 +86,7 @@ def app_streamlit():
         "https://assets.pokemon.com/assets/cms2/img/pokedex/full/129.png",  # Poissirène
         "https://assets.pokemon.com/assets/cms2/img/pokedex/full/043.png",  # Mystherbe
     ]
-    
+
     st.markdown("""
     <style>
         .poke-hover {
@@ -103,6 +113,7 @@ def app_streamlit():
         "</div>",
         unsafe_allow_html=True,
     )
+
 
     # Initialize session state for messages
     if "messages" not in st.session_state:
@@ -134,8 +145,4 @@ def app_streamlit():
 
 
 if __name__ == "__main__":
-    if not os.path.exists("chroma_db") and os.path.exists("chroma_db.zip"):
-        print("Décompression de la base vectorielle...")
-        with zipfile.ZipFile("chroma_db.zip", "r") as zip_ref:
-            zip_ref.extractall("chroma_db")
     app_streamlit()
